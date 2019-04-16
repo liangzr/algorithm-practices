@@ -1,0 +1,23 @@
+#! /usr/bin/env node
+
+/* eslint-disable import/no-dynamic-require, global-require */
+
+const fs = require('fs');
+const path = require('path');
+
+const data = require('./source');
+
+const fnDirs = path.resolve(__dirname, './methods');
+const algorithms = fs.readdirSync(fnDirs).map(filename => path.join(fnDirs, filename));
+const sortMethods = algorithms.map(p => require(p));
+
+sortMethods.forEach((alg) => {
+  if (!Array.isArray(alg)) alg = [alg];
+  alg.forEach((v) => {
+    const tag = `${v.tag}: `;
+    const input = data.concat([]);
+    console.time(tag);
+    v.method(input);
+    console.timeEnd(tag);
+  });
+});
